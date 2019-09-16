@@ -26,16 +26,23 @@ if len(sys.argv) >= 3:
     if len(port) == 2:
         startWebServerPort = int(port[1])
 
-os.chdir(os.path.join(os.getcwd(), 'build', buildName))
+if sys.version_info < (3,7):
+    sys.stderr.write('Error: Python at least version 3.7 required')
+    sys.exit(2)
 
+from http.server import HTTPServer as BaseHTTPServer, SimpleHTTPRequestHandler
+class HTTPServer(BaseHTTPServer):
+    def __init__(self, base_path, server_address, RequestHandlerClass=SimpleHTTPRequestHandler):
+        self.base_path = base_path
+        BaseHTTPServer.__init__(self, server_address, RequestHandlerClass)
+
+    def finish_request(self, request, client_address):
+        self.RequestHandlerClass(request, client_address, self, directory=self.base_path)
+
+httpd = HTTPServer(dir, ('localhost', startWebServerPort))
+print('Update channel: %s\nServing at port %i' % (buildName, startWebServerPort))
 try:
-    # Python 2
-    from SimpleHTTPServer import test
-    sys.argv[1] = startWebServerPort
-    test()
-except ImportError:
-    # Python 3
-    from http.server import test, SimpleHTTPRequestHandler
-    test(HandlerClass=SimpleHTTPRequestHandler, port=startWebServerPort)
-
-print('Update channel "%s" opened. Start a web server on port %i' % (buildName, startWebServerPort))
+    httpd.serve_forever()
+except KeyboardInterrupt:
+    print('\nKeyboard interrupt received, exiting.')
+    sys.exit(0)
