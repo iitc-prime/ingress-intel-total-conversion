@@ -4,6 +4,7 @@
 
 import os
 import sys
+from functools import partial
 
 # argv[0] = program, argv[1] = buildname, len=2
 if len(sys.argv) == 1: # load defaultBuild from settings file
@@ -30,19 +31,7 @@ if sys.version_info < (3,7):
     sys.stderr.write('Error: Python at least version 3.7 required')
     sys.exit(2)
 
-from http.server import HTTPServer as BaseHTTPServer, SimpleHTTPRequestHandler
-class HTTPServer(BaseHTTPServer):
-    def __init__(self, base_path, server_address, RequestHandlerClass=SimpleHTTPRequestHandler):
-        self.base_path = base_path
-        BaseHTTPServer.__init__(self, server_address, RequestHandlerClass)
-
-    def finish_request(self, request, client_address):
-        self.RequestHandlerClass(request, client_address, self, directory=self.base_path)
-
-httpd = HTTPServer(dir, ('localhost', startWebServerPort))
-print('Update channel: %s\nServing at port %i' % (buildName, startWebServerPort))
-try:
-    httpd.serve_forever()
-except KeyboardInterrupt:
-    print('\nKeyboard interrupt received, exiting.')
-    sys.exit(0)
+from http.server import test, SimpleHTTPRequestHandler
+handler_class = partial(SimpleHTTPRequestHandler, directory=dir)
+print('Update channel: %s' % buildName)
+test(HandlerClass=handler_class, port=startWebServerPort, bind='localhost')
