@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
-# Utility to generate meta.json for IITC-Button (https://github.com/IITC-CE/IITC-Button).
-# Can be run manually, or integrated with build process using localbuildsettings.py.
-# Sample content for localbuildsettings.py:
-# buildSettings = {
-#     'local': {
-#          # ...
-#         'postBuild': ['web-meta-gen.py']
-#     },
-# }
+description = """
+Utility to generate meta.json for IITC-Button (https://github.com/IITC-CE/IITC-Button).
+Can be run manually, or integrated with build process using localbuildsettings.py.
+Sample content for localbuildsettings.py:
+buildSettings = {
+    'local': {
+         # ...
+        'postBuild': ['web-meta-gen.py']
+    },
+}"""
 
 import re
 import io
@@ -88,20 +89,24 @@ if __name__ == 'build.py':
     gen_meta(buildName)
 
 if __name__ == '__main__':
+    import argparse
 
-    # argv[0] = program, argv[1] = buildname, len=2
-    if len(sys.argv) == 1: # load defaultBuild from settings file
+    parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
+
+    parser.add_argument('buildname', type=str, nargs='?',
+                        help='Specify build name')
+    args = parser.parse_args()
+
+    if not args.buildname:
         try:
-            from localbuildsettings import defaultBuild as buildName
+            from localbuildsettings import defaultBuild
+            print('using defaults from localbuildsettings...')
+            args.buildname = defaultBuild
         except ImportError:
-            sys.stderr.write('Usage: %s buildname' % os.path.basename(sys.argv[0]))
-            sys.exit(2)
-    else: # build name from command line
-        buildName = sys.argv[1]
+            parser.error('the following arguments are required: buildname')
 
-    dir = os.path.join(os.getcwd(), 'build', buildName)
+    dir = os.path.join(os.getcwd(), 'build', args.buildname)
     if not os.path.exists(dir) or os.path.isfile(dir):
-        sys.stderr.write('Directory not found: %s' % dir)
-        sys.exit(1)
+        parser.error('Directory not found: ' + dir)
 
-    gen_meta(buildName)
+    gen_meta(args.buildname)
