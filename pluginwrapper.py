@@ -3,7 +3,7 @@
 # 2. the wrapper is formatted correctly for removal by the IITC Mobile android app
 
 # putting everything in a wrapper function that in turn is placed in a
-# script tag on the website allows us to execute in the site’s context
+# script tag on the website allows us to execute in the site's context
 # instead of in the Greasemonkey/Extension/etc. context.
 
 # a cut-down version of GM_info is passed as a parameter to the script
