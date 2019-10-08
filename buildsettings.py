@@ -33,6 +33,7 @@ buildSettings = {
         'resourceUrlBase': None,
         'distUrlBase': None,
         'buildMobile': 'debug',
+        'ignore_patterns': ['speech-search*', 'scroll-wheel-zoom-disable*'],
     },
 
 
