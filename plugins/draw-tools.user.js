@@ -640,6 +640,8 @@ window.plugin.drawTools.boot = function() {
   //add the layer
   window.addLayerGroup('Drawn Items', window.plugin.drawTools.drawnItems, true);
 
+  // HOOK: pluginDrawTools
+  // custom hook for draw tools to share it's activity with other plugins
 
   //place created items into the specific layer
   map.on('draw:created', function(e) {
