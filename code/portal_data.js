@@ -8,7 +8,7 @@ window.getPortalLinks = function(guid) {
   var links = { in: [], out: [] };
 
   $.each(window.links, function(g,l) {
-    var d = l.options.data;
+    var d = l.properties.data;
 
     if (d.oGuid == guid) {
       links.out.push(g);
@@ -32,7 +32,7 @@ window.getPortalFields = function(guid) {
   var fields = [];
 
   $.each(window.fields, function(g,f) {
-    var d = f.options.data;
+    var d = f.properties.data;
 
     if ( d.points[0].guid == guid
       || d.points[1].guid == guid

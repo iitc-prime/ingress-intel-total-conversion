@@ -58,17 +58,15 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
     throw new Error('API changed: isFaction flag now a channel string - all, faction, alerts');
   }
 
-  var b = clampLatLngBounds(map.getBounds());
+  var b = window.map.getBounds();
 
   // set a current bounding box if none set so far
   if (!chat._oldBBox) chat._oldBBox = b;
 
   // to avoid unnecessary chat refreshes, a small difference compared to the previous bounding box
   // is not considered different
-  var CHAT_BOUNDINGBOX_SAME_FACTOR = 0.1;
   // if the old and new box contain each other, after expanding by the factor, don't reset chat
-  if (!(b.pad(CHAT_BOUNDINGBOX_SAME_FACTOR).contains(chat._oldBBox) && chat._oldBBox.pad(CHAT_BOUNDINGBOX_SAME_FACTOR).contains(b))) {
-    log.log('Bounding Box changed, chat will be cleared (old: '+chat._oldBBox.toBBoxString()+'; new: '+b.toBBoxString()+')');
+    log.log('Bounding Box changed, chat will be cleared (old: '+chat._oldBBox.toString()+'; new: '+b.toString()+')');
 
     $('#chat > div').data('needsClearing', true);
 
@@ -88,16 +86,13 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
     chat._alerts.newestTimestamp = -1;
 
     chat._oldBBox = b;
-  }
 
-  var ne = b.getNorthEast();
-  var sw = b.getSouthWest();
   var data = {
 //    desiredNumItems: isFaction ? CHAT_FACTION_ITEMS : CHAT_PUBLIC_ITEMS ,
-    minLatE6: Math.round(sw.lat*1E6),
-    minLngE6: Math.round(sw.lng*1E6),
-    maxLatE6: Math.round(ne.lat*1E6),
-    maxLngE6: Math.round(ne.lng*1E6),
+    minLatE6: Math.round(b[1]*1E6),
+    minLngE6: Math.round(b[0]*1E6),
+    maxLatE6: Math.round(b[3]*1E6),
+    maxLngE6: Math.round(b[2]*1E6),
     minTimestampMs: -1,
     maxTimestampMs: -1,
     tab: channel,
@@ -289,7 +284,7 @@ window.chat.renderAlerts = function(oldMsgsWereAdded) {
 
 window.chat.nicknameClicked = function(event, nickname) {
   var hookData = { event: event, nickname: nickname };
-  
+
   if (window.runHooks('nicknameClicked', hookData)) {
     window.chat.addNickname('@' + nickname);
   }
@@ -553,7 +548,7 @@ window.chat.needMoreMessages = function() {
   var hasScrollbar = scrollBottom(activeChat) !== 0 || activeChat.scrollTop() !== 0;
   var nearTop = activeChat.scrollTop() <= CHAT_REQUEST_SCROLL_TOP;
   if(hasScrollbar && !nearTop) return;
-  
+
   if(activeTab === 'faction')
     chat.requestFaction(true);
   else

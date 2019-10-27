@@ -4,15 +4,22 @@
 
 // retrieves current position from map and stores it cookies
 window.storeMapPosition = function() {
-  var m = window.map.getCenter();
+    var center = window.map.getCenter();
+    var lat = center.geometry.coordinates[1];
+    var lng = center.geometry.coordinates[0];
+    var zoom = window.map.getZoom();
+    var bearing = window.map.getBearing();
+    var pitch = window.map.getPitch();
 
-  if(m['lat'] >= -90  && m['lat'] <= 90)
-    writeCookie('ingress.intelmap.lat', m['lat']);
+    if(lat >= -90  && lat <= 90)
+        writeCookie('ingress.intelmap.lat', lat);
 
-  if(m['lng'] >= -180 && m['lng'] <= 180)
-    writeCookie('ingress.intelmap.lng', m['lng']);
+    if(lng >= -180 && lng <= 180)
+        writeCookie('ingress.intelmap.lng', lng);
 
-  writeCookie('ingress.intelmap.zoom', window.map.getZoom());
+    writeCookie('ingress.intelmap.zoom', zoom);
+    writeCookie('ingress.intelmap.bearing', bearing);
+    writeCookie('ingress.intelmap.pitch', pitch);
 }
 
 
@@ -20,43 +27,51 @@ window.storeMapPosition = function() {
 // URL or if neither is present, via Geolocation. If that fails, it
 // returns a map that shows the whole world.
 window.getPosition = function() {
-  if(getURLParam('latE6') && getURLParam('lngE6')) {
-    log.log("mappos: reading email URL params");
-    var lat = parseInt(getURLParam('latE6'))/1E6 || 0.0;
-    var lng = parseInt(getURLParam('lngE6'))/1E6 || 0.0;
-    var z = parseInt(getURLParam('z')) || 17;
-    return {center: new L.LatLng(lat, lng), zoom: z};
-  }
+    var ret = {center: turf.point([0, 0]), zoom: 0, bearing: 0, pitch: 0};
+    if(getURLParam('latE6') && getURLParam('lngE6')) {
+        log.log("mappos: reading email URL params");
+        var lat = parseInt(getURLParam('latE6'))/1E6 || 0.0;
+        var lng = parseInt(getURLParam('lngE6'))/1E6 || 0.0;
+        ret.center = turf.point([lng, lat]);
+        ret.zoom = parseInt(getURLParam('z')) || 17;
+        return ret;
+    }
 
-  if(getURLParam('ll')) {
-    log.log("mappos: reading stock Intel URL params");
-    var lat = parseFloat(getURLParam('ll').split(",")[0]) || 0.0;
-    var lng = parseFloat(getURLParam('ll').split(",")[1]) || 0.0;
-    var z = parseInt(getURLParam('z')) || 17;
-    return {center: new L.LatLng(lat, lng), zoom: z};
-  }
+    if(getURLParam('ll')) {
+        log.log("mappos: reading stock Intel URL params");
+        var lat = parseFloat(getURLParam('ll').split(",")[0]) || 0.0;
+        var lng = parseFloat(getURLParam('ll').split(",")[1]) || 0.0;
+        ret.center = turf.point([lng, lat]);
+        ret.zoom = parseFloat(getURLParam('z')) || 17;
+        return ret;
+    }
 
-  if(getURLParam('pll')) {
-    log.log("mappos: reading stock Intel URL portal params");
-    var lat = parseFloat(getURLParam('pll').split(",")[0]) || 0.0;
-    var lng = parseFloat(getURLParam('pll').split(",")[1]) || 0.0;
-    var z = parseInt(getURLParam('z')) || 17;
-    return {center: new L.LatLng(lat, lng), zoom: z};
-  }
+    if(getURLParam('pll')) {
+        log.log("mappos: reading stock Intel URL portal params");
+        var lat = parseFloat(getURLParam('pll').split(",")[0]) || 0.0;
+        var lng = parseFloat(getURLParam('pll').split(",")[1]) || 0.0;
+        ret.center = turf.point([lng, lat]);
+        ret.zoom = parseFloat(getURLParam('z')) || 17;
+        return ret;
+    }
 
-  if(readCookie('ingress.intelmap.lat') && readCookie('ingress.intelmap.lng')) {
-    log.log("mappos: reading cookies");
-    var lat = parseFloat(readCookie('ingress.intelmap.lat')) || 0.0;
-    var lng = parseFloat(readCookie('ingress.intelmap.lng')) || 0.0;
-    var z = parseInt(readCookie('ingress.intelmap.zoom')) || 17;
+    if(readCookie('ingress.intelmap.lat') && readCookie('ingress.intelmap.lng')) {
+        log.log("mappos: reading cookies");
+        var lat = parseFloat(readCookie('ingress.intelmap.lat')) || 0.0;
+        var lng = parseFloat(readCookie('ingress.intelmap.lng')) || 0.0;
+        if(lat < -90  || lat > 90) lat = 0.0;
+        if(lng < -180 || lng > 180) lng = 0.0;
+        ret.center = turf.point([lng, lat]);
+        ret.zoom = parseFloat(readCookie('ingress.intelmap.zoom')) || 17;
+        if (readCookie('ingress.intelmap.bearing')) {
+            ret.bearing = parseFloat(readCookie('ingress.intelmap.bearing')) || 0.0;
+        }
+        if (readCookie('ingress.intelmap.pitch')) {
+            ret.pitch = parseFloat(readCookie('ingress.intelmap.pitch')) || 0.0;
+        }
 
-    if(lat < -90  || lat > 90) lat = 0.0;
-    if(lng < -180 || lng > 180) lng = 0.0;
+        return ret;
+    }
 
-    return {center: new L.LatLng(lat, lng), zoom: z};
-  }
-
-  setTimeout("window.map.locate({setView : true});", 50);
-
-  return {center: new L.LatLng(0.0, 0.0), zoom: 1};
+    return {center: turf.point([0, 0]), zoom: 1};
 }

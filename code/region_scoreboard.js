@@ -139,10 +139,10 @@ window.RegionScoreboard = (function() {
 
 
   function showDialog() {
-    var latLng = map.getCenter();
+    var center = window.map.getCenter();
 
-    var latE6 = Math.round(latLng.lat*1E6);
-    var lngE6 = Math.round(latLng.lng*1E6);
+    var latE6 = Math.round(center.geometry.coordinates[1]*1E6);
+    var lngE6 = Math.round(center.geometry.coordinates[0]*1E6);
 
     showRegion(latE6, lngE6);
   }

@@ -34,13 +34,13 @@ if (!window.PLAYER || !PLAYER.nickname) {
     throw new Error("Logged in but page doesn't have player data");
   }
   // FIXME: handle nia takedown in progress
-  
+
   // add login form stylesheet
   var style = document.createElement('style');
   style.type = 'text/css';
   style.appendChild(document.createTextNode('@@INCLUDESTRING:login.css@@'));
   document.head.appendChild(style);
-  
+
   throw new Error("Couldn't retrieve player data. Are you logged in?");
 }
 
@@ -51,11 +51,12 @@ if (!window.PLAYER || !PLAYER.nickname) {
 // security context so we can access the API easily. Setup as much as
 // possible without requiring scripts.
 document.head.innerHTML = ''
-  + '<title>Ingress Intel Map</title>'
+  + '<title>IITC Prime</title>'
   + '<style>@@INCLUDESTRING:style.css@@</style>'
-  + '<style>@@INCLUDECSS:external/leaflet.css@@</style>'
-//note: smartphone.css injection moved into code/smartphone.js
-  + '<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,400,400italic,500,500italic,700,700italic&subset=latin,cyrillic-ext,greek-ext,greek,vietnamese,latin-ext,cyrillic"/>';
+  + '<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />'
+  + '<link href="https://fonts.googleapis.com/css?family=Exo&display=swap" rel="stylesheet">'
+  + '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>'
+  + '<link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css" rel="stylesheet" />';
 
 // remove body element entirely to remove event listeners
 document.body = document.createElement('body');
@@ -79,7 +80,7 @@ document.body.innerHTML = ''
   + '</tr></table></form>'
   + '<a id="sidebartoggle" accesskey="i" title="Toggle sidebar [i]"><span class="toggle close"></span></a>'
   + '<div id="scrollwrapper">' // enable scrolling for small screens
-  + '  <div id="sidebar" style="display: none">'
+  + '  <div id="sidebar">'
   + '    <div id="playerstat">t</div>'
   + '    <div id="gamestat">&nbsp;loading global control stats</div>'
   + '    <div id="searchwrapper">'
@@ -92,9 +93,9 @@ document.body.innerHTML = ''
   + '      <a onmouseover="setPermaLink(this)" onclick="setPermaLink(this);return androidPermalink()" title="URL link to this map view">Permalink</a>'
   + '      <a onclick="window.aboutIITC()" style="cursor: help">About IITC</a>'
   + '    </div>'
+  + '    <div id="updatestatus"><div id="innerstatus"></div></div>'
   + '  </div>'
   + '</div>'
-  + '<div id="updatestatus"><div id="innerstatus"></div></div>'
   // avoid error by stock JS
   + '<div id="play_button"></div>';
 

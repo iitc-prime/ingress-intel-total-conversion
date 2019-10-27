@@ -4,25 +4,8 @@
 
 window.portalMarkerScale = function() {
   var zoom = map.getZoom();
-  if (L.Browser.mobile)
-    return zoom >= 16 ? 1.5 : zoom >= 14 ? 1.2 : zoom >= 11 ? 1.0 : zoom >= 8 ? 0.65 : 0.5;
-  else
-    return zoom >= 14 ? 1 : zoom >= 11 ? 0.8 : zoom >= 8 ? 0.65 : 0.5;
+  return zoom >= 14 ? 1 : zoom >= 11 ? 0.8 : zoom >= 8 ? 0.65 : 0.5;
 }
-
-// create a new marker. 'data' contain the IITC-specific entity data to be stored in the object options
-window.createMarker = function(latlng, data) {
-  var styleOptions = window.getMarkerStyleOptions(data);
-
-  var options = L.extend({}, data, styleOptions, { interactive: true });
-
-  var marker = L.circleMarker(latlng, options);
-
-  highlightPortal(marker);
-
-  return marker;
-}
-
 
 window.setMarkerStyle = function(marker, selected) {
 

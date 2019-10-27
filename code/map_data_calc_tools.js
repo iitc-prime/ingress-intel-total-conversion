@@ -88,6 +88,7 @@ window.debugMapZoomParameters = function() {
 window.getMapZoomTileParameters = function(zoom) {
 
   var maxTilesPerEdge = window.TILE_PARAMS.TILES_PER_EDGE[window.TILE_PARAMS.TILES_PER_EDGE.length-1];
+    zoom = Math.floor(zoom);
 
   return {
     level: window.TILE_PARAMS.ZOOM_TO_LEVEL[zoom] || 0,

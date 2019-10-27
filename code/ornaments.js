@@ -22,25 +22,25 @@ window.ornaments = {
 
   setup: function () {
     this._portals = {};
-    var layerGroup = L.layerGroup;
-    if (window.map.options.preferCanvas && L.Browser.canvas) {
-      layerGroup = L.canvasIconLayer;
-      L.CanvasIconLayer.mergeOptions({ padding: L.Canvas.prototype.options.padding });
-    }
-    this._layer = layerGroup();
-    this._beacons = layerGroup();
-    this._frackers = layerGroup();
-    window.addLayerGroup('Ornaments', this._layer, true);
-    window.addLayerGroup('Beacons', this._beacons, true);
-    window.addLayerGroup('Frackers', this._frackers, true);
+//    var layerGroup = L.layerGroup;
+//    if (window.map.options.preferCanvas && L.Browser.canvas) {
+//      layerGroup = L.canvasIconLayer;
+//      L.CanvasIconLayer.mergeOptions({ padding: L.Canvas.prototype.options.padding });
+//    }
+//    this._layer = layerGroup();
+//    this._beacons = layerGroup();
+//    this._frackers = layerGroup();
+//    window.addLayerGroup('Ornaments', this._layer, true);
+//    window.addLayerGroup('Beacons', this._beacons, true);
+//    window.addLayerGroup('Frackers', this._frackers, true);
   },
 
   addPortal: function (portal) {
     this.removePortal(portal);
 
-    var ornaments = portal.options.data.ornaments;
+    var ornaments = portal.properties.data.ornaments;
     if (ornaments && ornaments.length) {
-      this._portals[portal.options.guid] = ornaments.map(function (ornament) {
+      this._portals[portal.properties.guid] = ornaments.map(function (ornament) {
         var layer = this._layer;
         if (ornament.startsWith('pe')) {
           layer = ornament === 'peFRACK'
@@ -64,10 +64,10 @@ window.ornaments = {
   },
 
   removePortal: function (portal) {
-    var guid = portal.options.guid;
+    var guid = portal.properties.guid;
     if (this._portals[guid]) {
       this._portals[guid].forEach(function (marker) {
-        marker.options.layer.removeLayer(marker);
+        marker.properties.layer.removeLayer(marker);
       });
       delete this._portals[guid];
     }

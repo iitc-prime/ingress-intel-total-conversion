@@ -28,7 +28,7 @@ html, body {
 
 body {
   font-size: 14px;
-  font-family: Roboto, "Helvetica Neue", Helvetica, sans-serif;
+  font-family: 'Exo', sans-serif;
   margin: 0;
 }
 
@@ -60,8 +60,8 @@ i.large { font-size: 6rem; }
 }
 
 #sidebar {
-  background-color: rgba(8, 48, 78, 0.9);
-  border-left: 1px solid #20A8B1;
+  background-color: rgba(0, 0, 0, 0.66);
+  border-left: 1px solid #733D96;
   color: #888;
   position: relative;
   left: 0;
@@ -81,9 +81,9 @@ i.large { font-size: 6rem; }
   position: absolute;
   top: 108px;
   z-index: 3001;
-  background-color: rgba(8, 48, 78, 0.9);
-  color: #FFCE00;
-  border: 1px solid #20A8B1;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+  border: 1px solid #733D96;
   border-right: none;
   border-radius: 5px 0 0 5px;
   text-decoration: none;
@@ -107,7 +107,7 @@ i.large { font-size: 6rem; }
 }
 
 a {
-  color: #ffce00;
+  color: #ffffff;
   cursor: pointer;
   text-decoration: none;
 }
@@ -143,7 +143,9 @@ a:hover {
   display: none;
 }
 
-
+.leaflet-container .leaflet-control-attribution {
+  display: none;
+}
 
 .help {
   cursor: help;
@@ -157,7 +159,7 @@ a:hover {
 
 /* field mu count */
 .fieldmu {
-  color: #FFCE00;
+  color: #ffffff;
   font-size: 13px;
   font-family: Roboto, "Helvetica Neue", Helvetica, sans-serif; /*override leaflet-container */
   text-align: center;
@@ -169,8 +171,8 @@ a:hover {
 /* chat ***************************************************************/
 
 #chatcontrols {
-  color: #FFCE00;
-  background: rgba(8, 48, 78, 0.9);
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.75);
   position: absolute;
   left: 0;
   z-index: 3000;
@@ -190,7 +192,7 @@ a:hover {
   text-align: center;
   height: 24px;
   line-height: 24px;
-  border: 1px solid #20A8B1;
+  border: 1px solid #733D96;
   vertical-align: top;
 }
 
@@ -200,14 +202,13 @@ a:hover {
 }
 
 #chatcontrols a.active {
-  border-color: #FFCE00;
+  border-color: #ffffff;
   border-bottom-width:0px;
   font-weight:bold;
-  background: rgb(8, 48, 78);
 }
 
 #chatcontrols a.active + a {
-  border-left-color: #FFCE00
+  border-left-color: #ffffff
 }
 
 
@@ -218,11 +219,11 @@ a:hover {
 }
 
 #chatcontrols .expand {
-  border-bottom: 10px solid #FFCE00;
+  border-bottom: 10px solid #ffffff;
 }
 
 #chatcontrols .shrink {
-  border-top: 10px solid #FFCE00;
+  border-top: 10px solid #ffffff;
 }
 
 #chatcontrols .loading {
@@ -258,10 +259,10 @@ a:hover {
   bottom: 23px;
   left: 0;
   z-index: 3000;
-  background: rgba(8, 48, 78, 0.9);
+  background: rgba(0, 0, 0, 0.75);
   line-height: 15px;
   color: #eee;
-  border: 1px solid #20A8B1;
+  border: 1px solid #733D96;
   border-bottom: 0;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -305,6 +306,7 @@ em {
   font-size: 13px;
   vertical-align: top;
   padding-bottom: 3px;
+  /* filter: blur(2px); */
 }
 
 /* time */
@@ -360,10 +362,10 @@ summary {
   bottom: 0;
   left: 0;
   padding: 0 2px;
-  background: rgba(8, 48, 78, 0.9);
+  background: rgba(0, 0, 0, 0.66);
   width: 708px;
   height: 23px;
-  border: 1px solid #20A8B1;
+  border: 1px solid #733D96;
   z-index: 3001;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -389,7 +391,7 @@ summary {
 /* sidebar ************************************************************/
 
 #sidebar > * {
-  border-bottom: 1px solid #20A8B1;
+  border-bottom: 1px solid #733D96;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -403,11 +405,11 @@ summary {
 }
 
 #sidebartoggle .open {
-  border-right: 10px solid #FFCE00;
+  border-right: 10px solid #ffffff;
 }
 
 #sidebartoggle .close {
-  border-left: 10px solid #FFCE00;
+  border-left: 10px solid #ffffff;
 }
 
 /* player stats */
@@ -416,7 +418,7 @@ summary {
 }
 
 h2 {
-  color: #ffce00;
+  color: #ffffff;
   font-size: 21px;
   padding: 0 4px;
   margin: 0;
@@ -496,7 +498,7 @@ input[type="text"], input[type="password"],
 input[type="number"], input[type="email"],
 input[type="search"], input[type="url"] {
   background-color: rgba(0, 0, 0, 0.3);
-  color: #ffce00;
+  color: #ffffff;
   height: 24px;
   padding:0px 4px 0px 4px;
   font-size: 12px;
@@ -525,7 +527,7 @@ input[type="search"], input[type="url"] {
   background-color: transparent;
 }
 #buttongeolocation:focus {
-  outline: 1px dotted #ffce00;
+  outline: 1px dotted #ffffff;
 }
 #buttongeolocation img {
   display: block;
@@ -732,7 +734,7 @@ h3.title {
 
 /* resonators */
 #resodetails {
-  margin-bottom: 0px;
+  margin-top: 10px;
 }
 
 .meter {
@@ -820,26 +822,12 @@ h3.title {
   top: -2px;
   right: 2px;
   cursor: pointer;
-  color: #FFCE00;
-  font-size: 16px;
+  color: #ffffff;
+  font-size: 32px;
 }
 
 /* update status */
 #updatestatus {
-  background-color: rgba(8, 48, 78, 0.9);
-  border-bottom: 0;
-  border-top: 1px solid #20A8B1;
-  border-left: 1px solid #20A8B1;
-  bottom: 0;
-  color: #ffce00;
-  font-size:13px;
-  padding: 4px;
-  position: fixed;
-  right: 0;
-  z-index: 3002;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
 }
 
 #updatestatus .map {
@@ -847,11 +835,11 @@ h3.title {
 }
 
 #loadlevel {
-  background: #FFF;
-  color: #000000;
+  background: rgba(255, 255, 255, 0.25);
+  color: #c4c7ff;
   display: inline-block;
   min-width: 1.8em;
-  border: 1px solid #20A8B1;
+  border: 1px solid #733D96;
   border-width: 0 1px;
   margin: -4px 0;
   padding: 4px 0.2em;
@@ -862,8 +850,8 @@ h3.title {
 .ui-tooltip, .ui-dialog {
   position: absolute;
   z-index: 9999;
-  background-color: rgba(8, 48, 78, 0.9);
-  border: 1px solid #20A8B1;
+  background-color: rgba(0, 0, 0, 0.75);
+  border: 1px solid #733D96;
   color: #eee;
   font-size: 13px;
   line-height: 15px;
@@ -894,7 +882,7 @@ h3.title {
 }
 
 .ui-tooltip, .ui-dialog a {
-  color: #FFCE00;
+  color: #ffffff;
 }
 
 .ui-dialog {
@@ -911,7 +899,7 @@ h3.title {
   line-height: 15px;
   text-align: center;
   padding: 4px;
-  background-color: rgba(8, 60, 78, 0.9);
+  background-color: rgba(0, 0, 0, 0.9);
   min-width: 250px;
 }
 
@@ -921,7 +909,7 @@ h3.title {
 }
 
 .ui-dialog-title-active {
-  color: #ffce00;
+  color: #ffffff;
 }
 
 .ui-dialog-title-inactive {
@@ -1006,7 +994,7 @@ h3.title {
 
 .ui-dialog-buttonpane {
   padding: 6px;
-  border-top: 1px solid #20A8B1;
+  border-top: 1px solid #733D96;
 }
 
 .ui-dialog-buttonset {
@@ -1017,9 +1005,9 @@ h3.title {
 .ui-dialog-content button {
   padding: 2px;
   min-width: 40px;
-  color: #FFCE00;
-  border: 1px solid #FFCE00;
-  background-color: rgba(8, 48, 78, 0.9);
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  background-color: rgba(0, 0, 0, 0.75);
 }
 
 .ui-dialog-buttonset button:hover {
@@ -1116,7 +1104,7 @@ td + td {
   z-index: 2500;
   font-size:11px;
   background-color:#0E3C46;
-  color:#ffce00;
+  color:#ffffff;
 
 }
 
@@ -1143,7 +1131,7 @@ td + td {
 
 /** artifact dialog *****************/
 table.artifact tr > * {
-  background: rgba(8, 48, 78, 0.9);
+  background: rgba(0, 0, 0, 0.75);
 }
 
 table.artifact td.info {
@@ -1163,13 +1151,13 @@ table.artifact .portal {
 #map .leaflet-popup-content-wrapper {
   border-radius: 0px;
   -webkit-border-radius: 0px;
-  border: 1px solid #20A8B1;
+  border: 1px solid #733D96;
   background: #0e3d4e;
   pointer-events: auto;
 }
 
 #map .leaflet-popup-content {
-  color: #ffce00;
+  color: #ffffff;
   margin: 5px 8px;
 }
 
@@ -1185,7 +1173,7 @@ table.artifact .portal {
 
 #map .leaflet-popup-tip {
   /* change the tip from an arrow to a simple line */
-  background: #20A8B1;
+  background: #733D96;
   width: 1px;
   height: 20px;
   padding: 0;
@@ -1200,28 +1188,28 @@ table.artifact .portal {
 
 /* misc */
 .layer_off_warning {
-  color: #FFCE00;
+  color: #ffffff;
   margin: 8px;
   text-align: center;
 }
 
 /* region scores */
 .cellscore .ui-accordion-header, .cellscore .ui-accordion-content {
-	border: 1px solid #20a8b1;
-	margin-top: -1px;
-	display: block;
+        border: 1px solid #20a8b1;
+        margin-top: -1px;
+        display: block;
 }
 .cellscore .ui-accordion-header {
-	color: #ffce00;
-	outline: none
+        color: #ffffff;
+        outline: none
 }
 .cellscore .ui-accordion-header:before {
-	font-size: 18px;
-	margin-right: 2px;
-	content: "⊞";
+        font-size: 18px;
+        margin-right: 2px;
+        content: "⊞";
 }
 .cellscore .ui-accordion-header-active:before {
-	content: "⊟";
+        content: "⊟";
 }
 
 @-moz-document url-prefix() {
@@ -1236,20 +1224,20 @@ g.checkpoint:hover circle {
   stroke-width: 2px;
 }
 .checkpoint_table {
-	border-collapse: collapse;
+        border-collapse: collapse;
 }
 .checkpoint_table td {
-	text-align: right;
-	padding-left: 10px;
+        text-align: right;
+        padding-left: 10px;
 }
 
 .text-overflow-ellipsis {
-	display: inline-block;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	vertical-align: text-bottom;
-	width: 100%;
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        vertical-align: text-bottom;
+        width: 100%;
 }
 
 .cellscore #overview {
@@ -1275,63 +1263,106 @@ g.checkpoint:hover circle {
 
 /* tabs */
 .ui-tabs-nav {
-	display: block;
-	border-bottom: 1px solid #20a8b1;
-	border-top: 1px solid transparent;
-	margin: 3px 0 0;
-	padding: 0;
+        display: block;
+        border-bottom: 1px solid #20a8b1;
+        border-top: 1px solid transparent;
+        margin: 3px 0 0;
+        padding: 0;
 }
 .ui-tabs-nav::after {
-	content: '';
-	clear: left;
-	display: block;
-	height: 0;
-	width: 0;
+        content: '';
+        clear: left;
+        display: block;
+        height: 0;
+        width: 0;
 }
 .ui-tabs-nav li {
-	list-style: none;
-	display: block;
-	float:left;
-	margin: 0 0 -1px;
-	border: 1px solid #20a8b1;
+        list-style: none;
+        display: block;
+        float:left;
+        margin: 0 0 -1px;
+        border: 1px solid #20a8b1;
 }
 .ui-tabs-nav li.ui-tabs-active {
-	border-bottom-color: #0F2C3F;
-	background: #0F2C3F;
-	border-width: 2px 2px 1px;
-	font-weight: bold;
-	margin: -1px 1px;
+        border-bottom-color: #0F2C3F;
+        background: #0F2C3F;
+        border-width: 2px 2px 1px;
+        font-weight: bold;
+        margin: -1px 1px;
 }
 .ui-tabs-nav a {
-	display: inline-block;
-	padding: 0.2em 0.7em;
+        display: inline-block;
+        padding: 0.2em 0.7em;
 }
 .ui-tabs-nav .ui-icon {
-	display: inline-block;
-	font-size: 0;
-	height: 22px;
-	overflow: hidden;
-	position: relative;
-	vertical-align: top;
-	width: 16px;
+        display: inline-block;
+        font-size: 0;
+        height: 22px;
+        overflow: hidden;
+        position: relative;
+        vertical-align: top;
+        width: 16px;
 }
 .ui-tabs-nav .ui-icon-close::before {
-	content: "×";
-	font-size: 16px;
-	height: 16px;
-	position: absolute;
-	text-align: center;
-	top: 2px;
-	vertical-align: baseline;
-	width: 16px;
-	cursor: pointer;
+        content: "×";
+        font-size: 16px;
+        height: 16px;
+        position: absolute;
+        text-align: center;
+        top: 2px;
+        vertical-align: baseline;
+        width: 16px;
+        cursor: pointer;
 }
 
 svg.icon-button {
-	fill: currentColor;
+        fill: currentColor;
 }
 
-.leaflet-marker-icon > svg {
-	height: inherit;
-	width: inherit;
+.btn-real {
+  display: inline-block;
+  text-decoration: none;
+  color: white;/*アイコン色*/
+  width: 40px;
+  height: 40px;
+  line-height: 35px;
+  font-size: 20px;
+  border-radius: 50%;
+  text-align: center;
+  overflow: hidden;
+  outline: none;
+  background-image: linear-gradient(#2e3f6c 0%, #1d264c 100%);
+  border-color: transparent;
+  box-shadow:-1px -1px 2px 1px #00d1e1,1px 1px 1px 1px #934e91,0px 0px 0px 2px #3862be;
+  margin: 5px;
+  cursor: pointer;
+}
+
+
+h2 {
+    /* filter: blur(3px); */
+}
+
+#randdetails {
+  color: #c4c7ff;
+}
+
+#randdetails a {
+  color: #c4c7ff;
+}
+
+.linkdetails a {
+  color: #c4c7ff;
+}
+
+#toolbox a {
+  color: #c4c7ff;
+}
+
+#chatcontrols a {
+color: #c4c7ff;
+}
+
+#updatestatus {
+color: #c4c7ff;
 }
