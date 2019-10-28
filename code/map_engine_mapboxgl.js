@@ -91,16 +91,7 @@ window.MapboxGL.prototype.setup = function() {
                                     pitch: pos.pitch,
                                     logoPosition: 'bottom-right'
                                 });
-
-    var first = true;
-    var ready = function() {
-        if (first) {
-            window.runHooks("mapReady");
-            first = false;
-        }
-    };
-    this.map.on('render', ready);
-    this.map.on('load', function() { this.off('render', ready); });
+    window.runHooks("mapReady");
 
     this.map.on('load', function() {
         this.addSource('source-portal', {
