@@ -257,7 +257,7 @@ window.androidCopy = function(text) {
 }
 
 window.getCurrentZoomTileParameters = function() {
-    var zoom = getDataZoomForMapZoom( map.getZoom() );
+    var zoom = getDataZoomForMapZoom(window.map.getZoom() );
     var tileParams = getMapZoomTileParameters(zoom);
     return tileParams;
 }

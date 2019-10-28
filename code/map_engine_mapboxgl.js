@@ -81,13 +81,26 @@ class LayerControl {
 }
 
 window.MapboxGL.prototype.setup = function() {
+    var pos = window.getPosition();
     this.map = new mapboxgl.Map({
-                                      container: this.container,
-                                      style: 'mapbox://styles/mapbox/dark-v10',
-                                      zoom: 1,
-                                      center: [0, 0],
-                                      logoPosition: 'bottom-right'
-                                  });
+                                    container: this.container,
+                                    style: 'mapbox://styles/mapbox/dark-v10',
+                                    center: pos.center.geometry.coordinates,
+                                    zoom: pos.zoom,
+                                    bearing: pos.bearing,
+                                    pitch: pos.pitch,
+                                    logoPosition: 'bottom-right'
+                                });
+
+    var first = true;
+    var ready = function() {
+        if (first) {
+            window.runHooks("mapReady");
+            first = false;
+        }
+    };
+    this.map.on('render', ready);
+    this.map.on('load', function() { this.off('render', ready); });
 
     this.map.on('load', function() {
         this.addSource('source-portal', {

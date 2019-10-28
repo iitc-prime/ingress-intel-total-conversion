@@ -73,6 +73,7 @@ window.setupIcons = function() {
 }
 
 window.setupMap = function() {
+    window.mapDataRequest = new MapDataRequest();
     $('#map').text('');
     var maps = [
                 new window.MapboxGL('map'),
@@ -82,8 +83,8 @@ window.setupMap = function() {
         var map = maps[i];
         if (!map.init())
             continue;
-        map.setup();
         window.map = map;
+        map.setup();
         break;
     }
 
@@ -124,9 +125,6 @@ window.setupMap = function() {
     // (the code originally called the request function directly, and triggered a normal delay for the next refresh.
     //  however, the moveend/zoomend gets triggered on map load, causing a duplicate refresh. this helps prevent that
     window.startRefreshTimeout(ON_MOVE_REFRESH*1000);
-
-    window.mapDataRequest = new MapDataRequest();
-    window.mapDataRequest.start();
 };
 
 // renders player details into the website. Since the player info is
@@ -330,9 +328,6 @@ function boot() {
     $('#sidebar').show();
 
     //  loadPlugins();
-
-    var pos = window.getPosition();
-    window.map.flyTo(pos.center, pos.zoom, pos.bearing, pos.pitch, {animation: false});
 
     //  window.runOnSmartphonesAfterBoot();
 

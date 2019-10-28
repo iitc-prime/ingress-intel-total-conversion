@@ -9,9 +9,10 @@ window.Leaflet.prototype.init = function() {
 };
 
 window.Leaflet.prototype.setup = function() {
+    var pos = window.getPosition();
     this.map = L.map(this.container, {
-                         center: [0, 0],
-                         zoom: 1
+                         center: [pos.center.geometry.coordinates[1], pos.center.geometry.coordinates[0]],
+                         zoom: parseInt(pos.zoom),
                      });
     L.gridLayer.googleMutant(
                 { type:'roadmap',
@@ -106,13 +107,13 @@ window.Leaflet.prototype.setup = function() {
                                         }
                                     }
                                 }).addTo(this.map);
-
     this.map.on('movestart', function() {
         window.runHooks('mapMoveStart');
     });
     this.map.on('moveend', function() {
         window.runHooks('mapMoveEnd');
     });
+    window.runHooks('mapReady');
 };
 
 window.Leaflet.prototype.getCenter = function() {

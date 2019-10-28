@@ -5,6 +5,7 @@
 
 
 window.MapDataRequest = function() {
+    this.status = { short: 'startup', long: undefined, progress: -1 };
     this.cache = new DataCache();
     this.render = new Render();
 
@@ -32,13 +33,12 @@ window.MapDataRequest = function() {
 
     // refresh timers
     this.MOVE_REFRESH = 3; //time, after a map move (pan/zoom) before starting the refresh processing
-    this.STARTUP_REFRESH = 3; //refresh time used on first load of IITC
+    this.STARTUP_REFRESH = 0; //refresh time used on first load of IITC
     this.IDLE_RESUME_REFRESH = 5; //refresh time used after resuming from idle
 
     // after one of the above, there's an additional delay between preparing the refresh (clearing out of bounds,
     // processing cache, etc) and actually sending the first network requests
-    this.DOWNLOAD_DELAY = 1;  //delay after preparing the data download before tile requests are sent
-
+    this.DOWNLOAD_DELAY = 0;  //delay after preparing the data download before tile requests are sent
 
     // a short delay between one request finishing and the queue being run for the next request.
     this.RUN_QUEUE_DELAY = 0;
@@ -66,11 +66,11 @@ window.MapDataRequest = function() {
     this.REFRESH_FAR = 900;  // refresh time for far views z <= 12
     this.FETCH_TO_REFRESH_FACTOR = 2;  //minimum refresh time is based on the time to complete a data fetch, times this value
 
-    // ensure we have some initial map status
-    this.setStatus ('startup', undefined, -1);
-
     // add a portalDetailLoaded hook, so we can use the extended details to update portals on the map
     var _this = this;
+    addHook('mapReady', function() {
+        _this.start();
+    });
     addHook('portalDetailLoaded', function(data){
         if(data.success) {
             _this.render.processGameEntities([data.ent]);
@@ -183,7 +183,6 @@ window.MapDataRequest.prototype.getStatus = function() {
 
 
 window.MapDataRequest.prototype.refresh = function() {
-
     // if we're idle, don't refresh
     if (window.isIdle()) {
         log.log('suspending map refresh - is idle');
@@ -346,25 +345,25 @@ window.MapDataRequest.prototype.refresh = function() {
 
     if (Object.keys(this.queuedTiles).length > 0) {
         // queued requests - don't start processing the download queue immediately - start it after a short delay
-        this.delayProcessRequestQueue (this.DOWNLOAD_DELAY,true);
+        this.delayProcessRequestQueue (this.DOWNLOAD_DELAY);
     } else {
         // all data was from the cache, nothing queued - run the queue 'immediately' so it handles the end request processing
-        this.delayProcessRequestQueue (0,true);
+        this.delayProcessRequestQueue (0);
     }
 }
 
 
-window.MapDataRequest.prototype.delayProcessRequestQueue = function(seconds,isFirst) {
+window.MapDataRequest.prototype.delayProcessRequestQueue = function(seconds) {
     if (this.timer === undefined) {
         var _this = this;
         this.timer = setTimeout ( function() {
-            _this.timer = setTimeout ( function() { _this.timer = undefined; _this.processRequestQueue(isFirst); }, seconds*1000 );
+            _this.timer = setTimeout ( function() { _this.timer = undefined; _this.processRequestQueue(); }, seconds*1000 );
         }, 0);
     }
 }
 
 
-window.MapDataRequest.prototype.processRequestQueue = function(isFirstPass) {
+window.MapDataRequest.prototype.processRequestQueue = function() {
 
     // if nothing left in the queue, finish
     if (Object.keys(this.queuedTiles).length == 0) {
@@ -432,7 +431,6 @@ window.MapDataRequest.prototype.processRequestQueue = function(isFirstPass) {
 
 
 window.MapDataRequest.prototype.sendTileRequest = function(tiles) {
-
     var tilesList = [];
 
     for (var i in tiles) {
