@@ -1,6 +1,10 @@
 window.MapboxGL = function(container)
 {
     this.map = undefined;
+    this.portalsUpdateTimer = undefined;
+    this.linksUpdateTimer = undefined;
+    this.fieldsUpdateTimer = undefined;
+
     MapEngine.call(this, container);
     if (localStorage['iitc-mapboxgl-accessToken']) {
         $('#toolbox').append('<a onclick="window.MapboxGL.clearAccessToken()">Clear mapbox accessToken</a>');
@@ -84,7 +88,7 @@ window.MapboxGL.prototype.setup = function() {
     var pos = window.getPosition();
     this.map = new mapboxgl.Map({
                                     container: this.container,
-                                    style: 'mapbox://styles/mapbox/dark-v10',
+                                    style: 'mapbox://styles/tasuku/ck2amdwue3xmn1dqqnpl0w1d5',
                                     center: pos.center.geometry.coordinates,
                                     zoom: pos.zoom,
                                     bearing: pos.bearing,
@@ -96,7 +100,9 @@ window.MapboxGL.prototype.setup = function() {
     this.map.on('load', function() {
         this.addSource('source-portal', {
                            "type": "geojson",
-                           "data": window.geojson.portals
+                           "data": window.geojson.portals,
+                           // https://docs.mapbox.com/help/troubleshooting/working-with-large-geojson-data/#adjusting-the-buffer
+                           "buffer": 0
                        });
         this.addSource('source-portal-selected', {
                            "type": "geojson",
@@ -112,17 +118,25 @@ window.MapboxGL.prototype.setup = function() {
                            "data": window.geojson.fields
                        });
 
-        // https://docs.mapbox.com/mapbox-gl-js/example/3d-buildings/
-        // Insert the layer beneath any symbol layer.
-        var layers = this.getStyle().layers;
-
-        var labelLayerId;
-        for (var i = 0; i < layers.length; i++) {
-            if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
-                this.setLayoutProperty(layers[i].id, 'visibility', 'none');
-                labelLayerId = layers[i].id;
-            }
-        }
+        this.addLayer({
+                          'id': 'layer-portal-selected',
+                          'source': 'source-portal-selected',
+                          'type': 'circle',
+                          'paint': {
+                              'circle-radius': {
+                                  'stops': [
+                                      [10, 20],
+                                      [20, 40]
+                                  ]
+                              },
+                              'circle-stroke-width': 4,
+                              'circle-color': '#ffffff',
+                              'circle-opacity': 0.25,
+                              'circle-stroke-color': '#ffffff',
+                              'circle-pitch-scale': 'map',
+                              'circle-pitch-alignment': 'map'
+                          }
+                      });
 
         this.addLayer({
                           'id': 'layer-field',
@@ -138,64 +152,7 @@ window.MapboxGL.prototype.setup = function() {
                               },
                               'fill-opacity': 0.20
                           }
-                      }, labelLayerId);
-
-        function makeGradient(i, colors) {
-            const len = colors.length;
-            const sides = colors.reduce((a, b, j) => {
-                                            const pos = (j / len + i) % 1 || 1;
-                                            a[a.length - 1].push(pos);
-                                            a[a.length - 1].push(b);
-                                            if (pos + 1 / len > 1) {
-                                                a.push([]);
-                                                a[a.length - 1].push(pos - 1);
-                                                a[a.length - 1].push(b);
-                                            }
-                                            return a;
-                                        }, [[]]);
-
-            return ['interpolate', ['linear'], ['line-progress']].concat(
-                        sides.reduce((a, b) => { return b.concat(a); }, []));
-        }
-
-        this.addLayer({
-                          'id': 'layer-link-enl',
-                          'source': 'source-link',
-                          'type': 'line',
-                          'filter': ['==', 'team', 2],
-                          "layout": {
-                              "line-join": "round",
-                              "line-cap": "round"
-                          },
-                          "paint": {
-                              "line-color": "#33a02c",
-                              "line-gradient": makeGradient(0, ['#33a02c', '#33a02c', '#33a02c', '#53ce4b', '#8cde87']),
-                              "line-width": 3
-                          }
-                      }, labelLayerId);
-        this.addLayer({
-                          'id': 'layer-link-res',
-                          'source': 'source-link',
-                          'type': 'line',
-                          'filter': ['==', 'team', 1],
-                          "layout": {
-                              "line-join": "round",
-                              "line-cap": "round"
-                          },
-                          "paint": {
-                              "line-color": "#1f78b4",
-                              "line-gradient": makeGradient(0, ['#1f78b4', '#1f78b4', '#1f78b4', '#419fde', '#82c0e9']),
-                              "line-width": 3
-                          }
-                      }, labelLayerId);
-        setTimeout(() => {
-                       let i = 0;
-                       setInterval(() => {
-                                       i += 0.015;
-                                       this.setPaintProperty('layer-link-enl', 'line-gradient', makeGradient(i, ['#33a02c', '#33a02c', '#33a02c', '#53ce4b', '#8cde87']));
-                                       this.setPaintProperty('layer-link-res', 'line-gradient', makeGradient(i, ['#1f78b4', '#1f78b4', '#1f78b4', '#419fde', '#82c0e9']));
-                                   }, 32);
-                   }, 1000);
+                      });
 
         for (var i = 0; i < 9; i++) {
             this.addLayer({
@@ -231,32 +188,6 @@ window.MapboxGL.prototype.setup = function() {
                                   'circle-pitch-scale': 'viewport',
                                   'circle-pitch-alignment': 'map'
                               }
-                          }, labelLayerId);
-            this.addLayer({
-                              'id': 'layer-portal-name-lv' + i,
-                              'source': 'source-portal',
-                              'type': 'symbol',
-                              'filter': ['==', 'level', i],
-                              'layout': {
-                                  'symbol-placement': 'point',
-                                  'text-anchor': 'top',
-                                  'text-field': {
-                                      "property": "title",
-                                      "type": "identity"
-                                  }
-                              },
-                              'paint': {
-                                  "text-color": 'white',
-                                  "text-halo-color": {
-                                      'property': 'team',
-                                      'stops': [
-                                          [0, '#ff7f00'],
-                                          [1, '#1f78b4'],
-                                          [2, '#33a02c']
-                                      ]
-                                  },
-                                  "text-halo-width": 1
-                              }
                           });
             this.on('click', 'layer-portal-lv' + i, function (e) {
                 var feature = e.features[0];
@@ -264,25 +195,65 @@ window.MapboxGL.prototype.setup = function() {
                 window.renderPortalDetails(guid);
             });
         }
+
+        function makeGradient(i, colors) {
+            const len = colors.length;
+            const sides = colors.reduce((a, b, j) => {
+                                            const pos = (j / len + i) % 1 || 1;
+                                            a[a.length - 1].push(pos);
+                                            a[a.length - 1].push(b);
+                                            if (pos + 1 / len > 1) {
+                                                a.push([]);
+                                                a[a.length - 1].push(pos - 1);
+                                                a[a.length - 1].push(b);
+                                            }
+                                            return a;
+                                        }, [[]]);
+
+            return ['interpolate', ['linear'], ['line-progress']].concat(
+                        sides.reduce((a, b) => { return b.concat(a); }, []));
+        }
+
         this.addLayer({
-                          'id': 'layer-portal-selected',
-                          'source': 'source-portal-selected',
-                          'type': 'circle',
-                          'paint': {
-                              'circle-radius': {
-                                  'stops': [
-                                      [10, 20],
-                                      [20, 40]
-                                  ]
-                              },
-                              'circle-stroke-width': 4,
-                              'circle-color': '#ffffff',
-                              'circle-opacity': 0.25,
-                              'circle-stroke-color': '#ffffff',
-                              'circle-pitch-scale': 'map',
-                              'circle-pitch-alignment': 'map'
+                          'id': 'layer-link-enl',
+                          'source': 'source-link',
+                          'type': 'line',
+                          'filter': ['==', 'team', 2],
+                          "layout": {
+                              "line-join": "round",
+                              "line-cap": "round"
+                          },
+                          "paint": {
+                              "line-color": "#33a02c",
+                              "line-gradient": makeGradient(0, ['#33a02c', '#33a02c', '#33a02c', '#53ce4b', '#8cde87']),
+                              "line-width": 3
                           }
-                      }, labelLayerId);
+                      });
+        this.addLayer({
+                          'id': 'layer-link-res',
+                          'source': 'source-link',
+                          'type': 'line',
+                          'filter': ['==', 'team', 1],
+                          "layout": {
+                              "line-join": "round",
+                              "line-cap": "round"
+                          },
+                          "paint": {
+                              "line-color": "#1f78b4",
+                              "line-gradient": makeGradient(0, ['#1f78b4', '#1f78b4', '#1f78b4', '#419fde', '#82c0e9']),
+                              "line-width": 3
+                          }
+                      });
+        setTimeout(() => {
+                       let i = 0;
+                       setInterval(() => {
+                                       i += 0.015;
+                                       this.setPaintProperty('layer-link-enl', 'line-gradient', makeGradient(i, ['#33a02c', '#33a02c', '#33a02c', '#53ce4b', '#8cde87']));
+                                       this.setPaintProperty('layer-link-res', 'line-gradient', makeGradient(i, ['#1f78b4', '#1f78b4', '#1f78b4', '#419fde', '#82c0e9']));
+                                   }, 32);
+                   }, 1000);
+
+
         this.addLayer({
                           'id': '3d-buildings',
                           'source': 'composite',
@@ -310,7 +281,36 @@ window.MapboxGL.prototype.setup = function() {
                               ],
                               'fill-extrusion-opacity': 0.60
                           }
-                      }, labelLayerId);
+                      });
+        for (i = 0; i < 9; i++) {
+            this.addLayer({
+                              'id': 'layer-portal-name-lv' + i,
+                              'source': 'source-portal',
+                              'type': 'symbol',
+                              'filter': ['==', 'level', i],
+                              'layout': {
+                                  'symbol-placement': 'point',
+                                  'text-anchor': 'top',
+                                  'text-field': {
+                                      "property": "title",
+                                      "type": "identity"
+                                  }
+                              },
+                              'paint': {
+                                  "text-color": 'white',
+                                  "text-halo-color": {
+                                      'property': 'team',
+                                      'stops': [
+                                          [0, '#ff7f00'],
+                                          [1, '#1f78b4'],
+                                          [2, '#33a02c']
+                                      ]
+                                  },
+                                  "text-halo-width": 1
+                              }
+                          });
+        }
+
         window.runHooks("mapbox.map.loaded", {map: this});
     });
 
@@ -394,24 +394,39 @@ window.MapboxGL.prototype.project = function(center, zoom) {
 }
 
 window.MapboxGL.prototype.updatePortals = function(geojson) {
-    if (!this.map) return;
-    var source = this.map.getSource('source-portal');
-    if (!source) return;
-    source.setData(geojson);
+    var self = this;
+    if (this.updatePortalsTimer) clearTimeout(this.updatePortalsTimer);
+    this.updatePortalsTimer = setTimeout ( function() {
+        self.updatePortalsTimer = undefined;
+        if (!self.map) return;
+        var source = self.map.getSource('source-portal');
+        if (!source) return;
+        source.setData(geojson);
+    }, 0);
 }
 
 window.MapboxGL.prototype.updateLinks = function(geojson) {
-    if (!this.map) return;
-    var source = this.map.getSource('source-link');
-    if (!source) return;
-    source.setData(geojson);
+    var self = this;
+    if (this.updateLinksTimer) clearTimeout(this.updateLinksTimer);
+    this.updateLinksTimer = setTimeout ( function() {
+        self.updateLinksTimer = undefined;
+        if (!self.map) return;
+        var source = self.map.getSource('source-link');
+        if (!source) return;
+        source.setData(geojson);
+    }, 0);
 }
 
 window.MapboxGL.prototype.updateFields = function(geojson) {
-    if (!this.map) return;
-    var source = this.map.getSource('source-field');
-    if (!source) return;
-    source.setData(geojson);
+    var self = this;
+    if (this.updateFieldsTimer) clearTimeout(this.updateFieldsTimer);
+    this.updateFieldsTimer = setTimeout ( function() {
+        self.updateFieldsTimer = undefined;
+        if (!self.map) return;
+        var source = self.map.getSource('source-field');
+        if (!source) return;
+        source.setData(geojson);
+    }, 0);
 }
 
 inherits(window.MapboxGL, window.MapEngine);
