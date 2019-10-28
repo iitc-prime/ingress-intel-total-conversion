@@ -237,8 +237,6 @@ window.Render.prototype.endRenderPass = function() {
     log.log('Render: end cleanup: removed '+countp+' portals, '+countl+' links, '+countf+' fields');
 
     // reorder portals to be after links/fields
-    this.bringPortalsToFront();
-
     this.isRendering = false;
 
     // re-select the selected portal, to re-render the side-bar. ensures that any data calculated from the map data is up to date
@@ -246,40 +244,6 @@ window.Render.prototype.endRenderPass = function() {
         renderPortalDetails (selectedPortal);
     }
 }
-
-window.Render.prototype.bringPortalsToFront = function() {
-    for (var lvl in portalsFactionLayers) {
-        // portals are stored in separate layers per faction
-        // to avoid giving weight to one faction or another, we'll push portals to front based on GUID order
-        var lvlPortals = {};
-        for (var fac in portalsFactionLayers[lvl]) {
-            var layer = portalsFactionLayers[lvl][fac];
-            if (layer._map) {
-                layer.eachLayer (function(p) {
-                    lvlPortals[p.properties.guid] = p;
-                });
-            }
-        }
-
-        var guids = Object.keys(lvlPortals);
-        guids.sort();
-
-        for (var j in guids) {
-            var guid = guids[j];
-            lvlPortals[guid].bringToFront();
-        }
-    }
-
-    /*
-  // artifact portals are always brought to the front, above all others
-  $.each(artifact.getInterestingPortals(), function(i,guid) {
-    if (portals[guid] && portals[guid]._map) {
-      portals[guid].bringToFront();
-    }
-  });
-  */
-}
-
 
 window.Render.prototype.deleteEntity = function(guid) {
     this.deletePortalEntity(guid);
@@ -297,7 +261,7 @@ window.Render.prototype.deletePortalEntity = function(guid) {
         }
         var p = window.portals[guid];
         window.ornaments.removePortal(p);
-        this.removePortalFromMapLayer(p);
+        this.removePortalFromSource(guid);
         delete window.portals[guid];
         window.runHooks('portalRemoved', {portal: p, data: p.properties.data });
     }
@@ -312,7 +276,7 @@ window.Render.prototype.deleteLinkEntity = function(guid) {
             }
         }
         var l = window.links[guid];
-        //    linksFactionLayers[l.properties.team].removeLayer(l);
+        this.removeLinkFromSource(guid);
         delete window.links[guid];
         window.runHooks('linkRemoved', {link: l, data: l.properties.data });
     }
@@ -328,9 +292,7 @@ window.Render.prototype.deleteFieldEntity = function(guid) {
             }
         }
         var f = window.fields[guid];
-        var fd = f.properties.details;
-
-        //    fieldsFactionLayers[f.properties.team].removeLayer(f);
+        this.removeFieldFromSource(guid);
         delete window.fields[guid];
         window.runHooks('fieldRemoved', {field: f, data: f.properties.data });
     }
@@ -633,19 +595,35 @@ window.Render.prototype.rescalePortalMarkers = function() {
 }
 
 
-
-// add the portal to the visible map layer
-window.Render.prototype.addPortalToMapLayer = function(portal) {
-    portalsFactionLayers[parseInt(portal.properties.level)||0][portal.properties.team].addLayer(portal);
-}
-
-window.Render.prototype.removePortalFromMapLayer = function(portal) {
+window.Render.prototype.removePortalFromSource = function(guid) {
     var features = window.geojson.portals.features;
     for (var i = 0; i < features.length; i++) {
         var feature = features[i];
-        if (feature.properties.guid === portal.properties.guid) {
+        if (feature.properties.guid === guid) {
             window.geojson.portals.features.splice(i, 1);
-            break;
+            return;
+        }
+    }
+}
+
+window.Render.prototype.removeLinkFromSource = function(guid) {
+    var features = window.geojson.links.features;
+    for (var i = 0; i < features.length; i++) {
+        var feature = features[i];
+        if (feature.properties.guid === guid) {
+            window.geojson.links.features.splice(i, 1);
+            return;
+        }
+    }
+}
+
+window.Render.prototype.removeFieldFromSource = function(guid) {
+    var features = window.geojson.fields.features;
+    for (var i = 0; i < features.length; i++) {
+        var feature = features[i];
+        if (feature.properties.guid === guid) {
+            window.geojson.fields.features.splice(i, 1);
+            return;
         }
     }
 }
