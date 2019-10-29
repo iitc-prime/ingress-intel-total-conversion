@@ -47,12 +47,8 @@ window.renderPortalDetails = function(guid) {
   var miscDetails = details ? getPortalMiscDetails(guid,details) : '';
   var resoDetails = details ? getResonatorDetails(details) : '';
 
-//TODO? other status details...
-  var statusDetails = details ? '' : '<div id="portalStatus">Loading details...</div>';
-
-
   var img = fixPortalImageUrl(details ? details.image : data.image);
-  var title = (details && details.title) || (data && data.title) || 'null';
+  var title = (details && details.title) || (data && data.title) || 'Loading details...';
 
   var lat = data.latE6/1E6;
   var lng = data.lngE6/1E6;
@@ -144,7 +140,6 @@ window.renderPortalDetails = function(guid) {
       resoDetails,
       modDetails,
       miscDetails,
-      statusDetails,
 
       $('<div>', { class: 'linkdetails' })
         .html(linkDetails.join(''))
