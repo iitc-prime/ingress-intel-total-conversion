@@ -88,7 +88,7 @@ window.MapboxGL.prototype.setup = function() {
     var pos = window.getPosition();
     this.map = new mapboxgl.Map({
                                     container: this.container,
-                                    style: 'mapbox://styles/tasuku/ck2amdwue3xmn1dqqnpl0w1d5?optimize=true',
+                                    style: 'mapbox://styles/tasuku/ck2amdwue3xmn1dqqnpl0w1d5',
                                     center: pos.center.geometry.coordinates,
                                     zoom: pos.zoom,
                                     bearing: pos.bearing,
