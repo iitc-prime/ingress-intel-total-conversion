@@ -46,6 +46,8 @@ window.MapEngine.prototype.panTo = function(center) {}
 
 window.MapEngine.prototype.flyTo = function(center, zoom, bearing = 0, pitch = 0, options = {}) {}
 
+window.MapEngine.prototype.fitBounds = function(bbox) {}
+
 window.MapEngine.prototype.project = function(center, zoom) {}
 
 window.MapEngine.prototype.updatePortals = function(geojson) {}

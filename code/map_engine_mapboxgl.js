@@ -255,7 +255,7 @@ window.MapboxGL.prototype.setup = function() {
                                        i += 0.015;
                                        this.setPaintProperty('layer-link-enl', 'line-gradient', makeGradient(i, ['#33a02c', '#33a02c', '#33a02c', '#53ce4b', '#8cde87']));
                                        this.setPaintProperty('layer-link-res', 'line-gradient', makeGradient(i, ['#1f78b4', '#1f78b4', '#1f78b4', '#419fde', '#82c0e9']));
-                                   }, 32);
+                                   }, 64);
                    }, 1000);
 
 
@@ -385,6 +385,10 @@ window.MapboxGL.prototype.panTo = function(center) {
 
 window.MapboxGL.prototype.flyTo = function(center, zoom, bearing = 0, pitch = 0, options = {}) {
     this.map.flyTo({center: mapboxgl.LngLat.convert(center.geometry.coordinates), zoom: zoom, bearing: bearing, pitch: pitch, animation: options.animation});
+}
+
+window.MapboxGL.prototype.fitBounds = function(bbox) {
+    this.map.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]]);
 }
 
 window.MapboxGL.prototype.project = function(center, zoom) {

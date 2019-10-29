@@ -31,8 +31,10 @@ window.search = {
 window.search.Query = function(term, confirmed) {
     this.term = term;
     this.confirmed = confirmed;
+    this.mapbox = undefined;
     this.init();
 };
+
 window.search.Query.prototype.init = function() {
     this.results = [];
 
@@ -64,7 +66,6 @@ window.search.Query.prototype.show = function() {
 window.search.Query.prototype.hide = function() {
     this.container.remove();
     this.removeSelectedResult();
-    this.removeHoverResult();
 };
 window.search.Query.prototype.addResult = function(result) {
     if(this.results.length == 0) {
@@ -78,12 +79,6 @@ window.search.Query.prototype.addResult = function(result) {
     .attr('tabindex', '0')
     .on('click dblclick', function(ev) {
         this.onResultSelected(result, ev);
-    }.bind(this))
-    .on('mouseover', function(ev) {
-        this.onResultHoverStart(result, ev);
-    }.bind(this))
-    .on('mouseout', function(ev) {
-        this.onResultHoverEnd(result, ev);
     }.bind(this))
     .keypress(function(ev) {
         if((ev.keyCode || ev.charCode || ev.which) == 32) {
@@ -119,7 +114,6 @@ window.search.Query.prototype.addResult = function(result) {
 };
 
 window.search.Query.prototype.onResultSelected = function(result, ev) {
-    this.removeHoverResult();
     this.removeSelectedResult();
     this.selectedResult = result;
 
@@ -127,21 +121,20 @@ window.search.Query.prototype.onResultSelected = function(result, ev) {
         if(result.onSelected(result, ev)) return;
     }
 
-    if(ev.type == 'dblclick') {
-        if(result.position) {
-            map.setView(result.position, 17);
-        } else if(result.bounds) {
-            map.fitBounds(result.bounds, {maxZoom: 17});
-        }
-    } else { // ev.type != 'dblclick'
-        if(result.bounds) {
-            map.fitBounds(result.bounds, {maxZoom: 17});
-        } else if(result.position) {
-            map.setView(result.position);
+    if(ev.type === 'click') {
+        switch (turf.getType(result.geojson)) {
+        case 'Point':
+            window.map.flyTo(result.geojson, Math.max(window.map.getZoom(), 17), window.map.getBearing(), window.map.getPitch());
+            break;
+        case 'Polygon':
+            window.map.fitBounds(turf.bbox(result.geojson));
+            break;
         }
     }
 
-    window.map.getSource('source-search').setData(result.geojson);
+    if (window.search.Query.mapbox) {
+        window.search.Query.mapbox.getSource('source-search').setData(result.geojson);
+    }
 }
 
 window.search.Query.prototype.removeSelectedResult = function() {
@@ -150,28 +143,6 @@ window.search.Query.prototype.removeSelectedResult = function() {
         if(this.selectedResult.onRemove) this.selectedResult.onRemove(this.selectedResult);
     }
 }
-
-window.search.Query.prototype.onResultHoverStart = function(result, ev) {
-    this.removeHoverResult();
-    this.hoverResult = result;
-
-    if(result === this.selectedResult) return;
-
-    window.map.getSource('source-search').setData(result.geojson);
-};
-
-window.search.Query.prototype.removeHoverResult = function() {
-    if(this.hoverResult !== this.selectedResult) {
-        if(this.hoverResult) {
-            if(this.hoverResult.layer) { map.removeLayer(this.hoverResult.layer); }
-        }
-    }
-    this.hoverResult = null;
-};
-
-window.search.Query.prototype.onResultHoverEnd = function(result, ev) {
-    this.removeHoverResult();
-};
 
 window.search.doSearch = function(term, confirmed) {
     term = term.trim();
@@ -206,6 +177,7 @@ window.search.doSearch = function(term, confirmed) {
 };
 
 window.search.setup = function() {
+    var self = this;
     $('#search')
     .keypress(function(e) {
         if((e.keyCode ? e.keyCode : e.which) != 13) return;
@@ -226,41 +198,51 @@ window.search.setup = function() {
     $('#buttongeolocation').click(function(){
         map.locate({setView : true, maxZoom: 13});
     });
-    window.addHook('mapbox.map.loaded', function(data) {
-        data.map.addSource('source-search', {
-                                 "type": "geojson",
-                                 "data": turf.featureCollection([])
-                             });
-        data.map.addLayer({
-                                'id': 'layer-search-point',
-                                'source': 'source-search',
-                                'type': 'symbol',
-                                "filter": [
-                                    "==",
-                                    "$type",
-                                    "Point"
-                                ],
-                                'layout': {
-                                    "icon-image": 'marker-15'
-                                }
-                            });
-        data.map.addLayer({
-                                'id': 'layer-search-polygon',
-                                'source': 'source-search',
-                                'type': 'fill',
-                                "filter": [
-                                    "==",
-                                    "$type",
-                                    "Polygon"
-                                ],
-                                'paint': {
-                                    "fill-color": 'red',
-                                    'fill-opacity': 0.25
-                                }
-                            });
-    })
 };
 
+
+window.addHook('mapbox.map.loaded', function(data) {
+    console.debug(data);
+    window.search.Query.mapbox = data.map;
+    data.map.addSource('source-search', {
+                             "type": "geojson",
+                             "data": turf.featureCollection([])
+                         });
+    data.map.addLayer({
+                            'id': 'layer-search-point',
+                            'source': 'source-search',
+                            'type': 'symbol',
+                            "filter": [
+                                "==",
+                                "$type",
+                                "Point"
+                            ],
+                            'layout': {
+                                "icon-image": 'embassy-15',
+                              "icon-size": 3,
+                              "icon-anchor": 'bottom',
+                              "icon-offset": [5, 3]
+                            }
+                        });
+    data.map.addLayer({
+                            'id': 'layer-search-polygon',
+                            'source': 'source-search',
+                            'type': 'line',
+                            "filter": [
+                                "==",
+                                "$type",
+                                "Polygon"
+                            ],
+                          'layout': {
+                              'line-join': 'round'
+                          },
+                            'paint': {
+                                "line-color": 'red',
+                                'line-opacity': 0.5,
+                              "line-width": 3
+                            }
+                        });
+});
 
 // search for portals
 addHook('search', function(query) {
@@ -268,28 +250,17 @@ addHook('search', function(query) {
     var teams = ['NEU','RES','ENL'];
 
     $.each(portals, function(guid, portal) {
-        var data = portal.options.data;
+        var data = portal.properties.data;
         if(!data.title) return;
 
         if(data.title.toLowerCase().indexOf(term) !== -1) {
-            var team = portal.options.team;
+            var team = portal.properties.team;
             var color = team==TEAM_NONE ? '#CCC' : COLORS[team];
             query.addResult({
                                 title: data.title,
                                 description: teams[team] + ', L' + data.level + ', ' + data.health + '%, ' + data.resCount + ' Resonators',
                                 geojson: portal,
                                 icon: 'data:image/svg+xml;base64,'+btoa('@@INCLUDESTRING:images/icon-portal.svg@@'.replace(/%COLOR%/g, color)),
-                                onSelected: function(result, event) {
-                                    if(event.type == 'dblclick') {
-                                        zoomToAndShowPortal(guid, portal.getLatLng());
-                                    } else if(window.portals[guid]) {
-                                        if(!map.getBounds().contains(result.position)) map.setView(result.position);
-                                        renderPortalDetails(guid);
-                                    } else {
-                                        window.selectPortalByLatLng(portal.getLatLng());
-                                    }
-                                    return true; // prevent default behavior
-                                },
                             });
         }
     });
@@ -313,17 +284,6 @@ addHook('search', function(query) {
                             title: ll,
                             description: 'geo coordinates',
                             geojson: turf.point([parseFloat(pair[1]), parseFloat(pair[0])]),
-                            onSelected: function(result, event) {
-                                for(var guid in window.portals) {
-                                    var p = window.portals[guid].getLatLng();
-                                    if((p.lat.toFixed(6)+","+p.lng.toFixed(6)) == ll) {
-                                        renderPortalDetails(guid);
-                                        return;
-                                    }
-                                }
-
-                                urlPortalLL = [result.position.lat, result.position.lng];
-                            },
                         });
     });
 });
@@ -334,7 +294,7 @@ addHook('search', function(query) {
     if(!query.confirmed) return;
 
     // Viewbox search orders results so they're closer to the viewbox
-    var mapBounds = window.geojson.convertFrom(map.getBounds());
+    var mapBounds = window.map.getBounds();
     var viewbox = '&viewbox=' + mapBounds.join(',');
 
     var resultCount = 0;
@@ -350,7 +310,6 @@ addHook('search', function(query) {
                 query.addResult({
                                     title: 'No results on OpenStreetMap',
                                     icon: '//www.openstreetmap.org/favicon.ico',
-                                    onSelected: function() {return true;},
                                 });
                 return;
             }
@@ -368,7 +327,7 @@ addHook('search', function(query) {
             };
 
             if(item.geojson) {
-                result.geojson = item.geojson;
+                result.geojson = { type: 'Feature', geometry: item.geojson };
             }
 
             if(item.boundingbox) {

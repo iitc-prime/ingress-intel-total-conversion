@@ -138,6 +138,10 @@ window.Leaflet.prototype.flyTo = function(center, zoom, bearing = 0, pitch = 0, 
     this.map.flyTo(L.latLng(center.geometry.coordinates[1], center.geometry.coordinates[0]), zoom, options);
 }
 
+window.Leaflet.prototype.fitBounds = function(bbox) {
+    this.map.fitBounds([[bbox[1], bbox[0]], [bbox[3], bbox[2]]]);
+}
+
 window.Leaflet.prototype.project = function(center, zoom) {
     var point = this.map.project(L.latLng(center.geometry.coordinates[1], center.geometry.coordinates[0]), zoom);
     return {
