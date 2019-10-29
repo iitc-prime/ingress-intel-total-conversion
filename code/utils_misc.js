@@ -288,16 +288,17 @@ window.selectPortalByLatLng = function(lat, lng) {
         lat = lat.lat;
     }
     for(var guid in window.portals) {
-        var latlng = window.portals[guid].getLatLng();
-        if(latlng.lat == lat && latlng.lng == lng) {
+        var latlng = window.portals[guid].geometry.coordinates;
+        if(latlng[1] === lat && latlng[0] === lng) {
             renderPortalDetails(guid);
+            window.map.panTo(turf.point([lng, lat]), window.map.getZoom());
             return;
         }
     }
 
     // not currently visible
     urlPortalLL = [lat, lng];
-    map.setView(urlPortalLL, 17);
+    window.map.flyTo(turf.point([lng, lat]), 17);
 };
 
 String.prototype.capitalize = function() {
