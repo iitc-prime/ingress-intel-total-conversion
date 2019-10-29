@@ -104,9 +104,14 @@ window.MapboxGL.prototype.setup = function() {
                            // https://docs.mapbox.com/help/troubleshooting/working-with-large-geojson-data/#adjusting-the-buffer
                            "buffer": 0
                        });
+        var selected = [];
+        if (window.selectedPortal && window.selectedPortal in window.portals) {
+            var portal = window.portals[window.selectedPortal];
+            selected.push(turf.point(portal.geometry.coordinates[1], portal.geometry.coordinates[0]));
+        }
         this.addSource('source-portal-selected', {
                            "type": "geojson",
-                           "data": turf.featureCollection([])
+                           "data": turf.featureCollection(selected)
                        });
         this.addSource('source-link', {
                            "type": "geojson",
@@ -344,8 +349,11 @@ window.MapboxGL.prototype.setup = function() {
 
     var self = this;
     window.addHook("portalSelected", function(option) {
-        var data = turf.featureCollection(option.portal ? [option.portal] : [])
-        self.map.getSource('source-portal-selected').setData(data)
+        var source = self.map.getSource('source-portal-selected');
+        if (source) {
+            var data = turf.featureCollection(option.portal ? [option.portal] : [])
+            source.setData(data)
+        }
     });
 };
 

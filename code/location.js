@@ -28,6 +28,13 @@ window.storeMapPosition = function() {
 // returns a map that shows the whole world.
 window.getPosition = function() {
     var ret = {center: turf.point([0, 0]), zoom: 0, bearing: 0, pitch: 0};
+    if (readCookie('ingress.intelmap.bearing')) {
+        ret.bearing = parseFloat(readCookie('ingress.intelmap.bearing')) || 0.0;
+    }
+    if (readCookie('ingress.intelmap.pitch')) {
+        ret.pitch = parseFloat(readCookie('ingress.intelmap.pitch')) || 0.0;
+    }
+
     if(getURLParam('latE6') && getURLParam('lngE6')) {
         log.log("mappos: reading email URL params");
         var lat = parseInt(getURLParam('latE6'))/1E6 || 0.0;
@@ -63,12 +70,6 @@ window.getPosition = function() {
         if(lng < -180 || lng > 180) lng = 0.0;
         ret.center = turf.point([lng, lat]);
         ret.zoom = parseFloat(readCookie('ingress.intelmap.zoom')) || 17;
-        if (readCookie('ingress.intelmap.bearing')) {
-            ret.bearing = parseFloat(readCookie('ingress.intelmap.bearing')) || 0.0;
-        }
-        if (readCookie('ingress.intelmap.pitch')) {
-            ret.pitch = parseFloat(readCookie('ingress.intelmap.pitch')) || 0.0;
-        }
 
         return ret;
     }

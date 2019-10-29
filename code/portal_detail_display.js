@@ -243,7 +243,7 @@ window.getPortalMiscDetails = function(guid,d) {
 // Returns true if it's still the same portal that just needs an
 // update.
 window.selectPortal = function(guid) {
-    selectedPortal = guid;
+    window.selectedPortal = guid;
     var portal = portals[guid];
     runHooks('portalSelected', {portal: portal});
     return true;
