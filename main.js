@@ -4,6 +4,10 @@
 // @version        0.29.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Total conversion for the ingress intel map.
 @@METAINFO@@
+// @namespace      https://github.com/IITC-Prime/ingress-intel-total-conversion
+// @include        https://intel.ingress.com/*
+// @match          https://intel.ingress.com/*
+// @grant          none
 // @run-at         document-end
 // ==/UserScript==
 

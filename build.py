@@ -64,11 +64,7 @@ pluginWrapper = import_module(settings.get('pluginWrapper','pluginwrapper'))
 pluginWrapper.startUseStrict = pluginWrapper.start.replace("{\n", "{\n\"use strict\";\n", 1)
 
 pluginMetaBlock = """// @updateURL      @@UPDATEURL@@
-// @downloadURL    @@DOWNLOADURL@@
-// @namespace      https://github.com/IITC-CE/ingress-intel-total-conversion
-// @include        https://intel.ingress.com/*
-// @match          https://intel.ingress.com/*
-// @grant          none"""
+// @downloadURL    @@DOWNLOADURL@@"""
 
 
 def readfile(fn):
