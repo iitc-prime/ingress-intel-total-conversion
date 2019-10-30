@@ -1,10 +1,8 @@
 name: CI
 
 on:
-  push:
-    # Sequence of patterns matched against refs/tags
-    tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  release:
+    types: [published]
 
 jobs:
   build:
@@ -15,16 +13,6 @@ jobs:
         uses: actions/checkout@master
       - name: Build project
         run: python ./build.py local
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: true
       - name: Upload Release Meta Asset
         id: upload-release-asset-meta
         uses: actions/upload-release-asset@v1.0.1
